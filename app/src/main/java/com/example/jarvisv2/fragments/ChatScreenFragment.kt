@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import com.example.jarvisv2.R
 
 class ChatScreenFragment : Fragment() {
@@ -16,7 +17,10 @@ class ChatScreenFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_chat_screen, container, false)
+        val view = inflater.inflate(R.layout.fragment_chat_screen, container, false)
+
+
+        return view
     }
 
 

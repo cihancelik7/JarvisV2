@@ -57,19 +57,20 @@
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
         app:lottie_rawRes="@raw/robotanimation"/>
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
+        android:background="@drawable/textviewbackground"
         android:id="@+id/continueBtn"
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="16dp"
-        android:backgroundTint="@color/black"
         android:textStyle="bold"
         android:text="Continue"
         android:layout_marginHorizontal="16dp"
+        android:textColor="@color/white"
         android:textSize="24sp"
-        android:fontFamily="@font/ubuntu_mono_regular"
+        android:fontFamily="@font/ubuntu_mono_regular"/>
 
 
 </RelativeLayout>
