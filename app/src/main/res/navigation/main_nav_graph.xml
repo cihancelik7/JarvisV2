@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav_graph"
+    app:startDestination="@id/welcomeScreenFragment">
+
+    <fragment
+        android:id="@+id/welcomeScreenFragment"
+        android:name="com.example.jarvisv2.fragments.WelcomeScreenFragment"
+        android:label="fragment_welcome_screen"
+        tools:layout="@layout/fragment_welcome_screen" >
+        <action
+            android:id="@+id/action_welcomeScreenFragment_to_robotListScreenFragment"
+            app:destination="@id/robotListScreenFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            />
+    </fragment>
+    <fragment
+        android:id="@+id/robotListScreenFragment"
+        android:name="com.example.jarvisv2.fragments.RobotListScreenFragment"
+        android:label="fragment_robot_list_screen"
+        tools:layout="@layout/fragment_robot_list_screen" >
+        <action
+            android:id="@+id/action_robotListScreenFragment_to_chatScreenFragment"
+            app:destination="@id/chatScreenFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            />
+    </fragment>
+    <fragment
+        android:id="@+id/chatScreenFragment"
+        android:name="com.example.jarvisv2.fragments.ChatScreenFragment"
+        android:label="fragment_chat_screen"
+        tools:layout="@layout/fragment_chat_screen" />
+</navigation>
