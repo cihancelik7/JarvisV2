@@ -18,9 +18,11 @@
         android:textAlignment="textStart"
         android:textStyle="bold"
         tools:text="Receiver Message"
+        android:textColor="@color/black"
         />
     <TextView
         android:id="@+id/txt_date"
+        android:textColor="@color/black"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginVertical="10dp"
