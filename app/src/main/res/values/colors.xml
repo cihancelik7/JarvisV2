@@ -3,4 +3,5 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="mainBackgroundColor">#8BC34A</color>
+    <color name="chatBackgroundColor">#F0EFF3</color>
 </resources>

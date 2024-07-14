@@ -6,7 +6,8 @@
     tools:context=".fragments.RobotListScreenFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
+        android:background="@drawable/textviewbackground"
         android:id="@+id/moveChatBtn"
         android:layout_gravity="center"
         android:layout_width="match_parent"

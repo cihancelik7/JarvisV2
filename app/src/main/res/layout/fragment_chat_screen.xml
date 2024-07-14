@@ -1,14 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/chatBackgroundColor"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragments.ChatScreenFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+    <include layout="@layout/toolbar_layout"/>
 
-</FrameLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/chat_rv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:orientation="vertical"
+        android:paddingTop="?actionBarSize"
+        android:layout_above="@id/rl_send"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
+    <RelativeLayout
+        android:id="@+id/rl_send"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginVertical="4dp"
+        android:layout_centerHorizontal="true"
+        >
+        <EditText
+            android:id="@+id/ed_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_edittext"
+            android:hint="Message"
+            android:textColorHint="#03A9F4"
+            android:inputType="textMultiLine"
+            android:maxLines="5"
+            android:layout_toStartOf="@id/send_image_btn"
+            android:minHeight="50dp"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:scrollbars="vertical"
+            android:textAlignment="viewStart"
+            android:textColor="#03A9F4"
+            android:textSize="16sp"/>
+
+        <ImageButton
+            android:id="@+id/send_image_btn"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentEnd="true"
+            android:backgroundTint="@color/mainBackgroundColor"
+            android:layout_centerVertical="true"
+            android:layout_marginHorizontal="8dp"
+            android:background="@drawable/bg_send_btn"
+            android:src="@drawable/ic_send"
+            />
+
+
+    </RelativeLayout>
+
+
+
+</RelativeLayout>
