@@ -167,15 +167,16 @@ class ChatScreenFragment : Fragment() {
 
         val send_image_btn = view.findViewById<ImageButton>(R.id.send_image_btn)
         val ed_message = view.findViewById<EditText>(R.id.ed_message)
-        var counter = -1
+   //     var counter = -1
         send_image_btn.setOnClickListener {
             view.context.hideKeyBoard(it)
             if (ed_message.text.toString().trim().isNotEmpty()) {
-                counter += 1
+             /*   counter += 1
                 if (counter >= chatList.size) {
                     return@setOnClickListener
                 }
-                chatViewModel.insertChat(chatList[counter])
+                chatViewModel.insertChat(chatList[counter])*/
+                chatViewModel.createChatCompletion(ed_message.text.toString().trim())
             } else {
                 view.context.longToastShow("Message is required")
             }
