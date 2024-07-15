@@ -1,17 +1,22 @@
 package com.example.jarvisv2.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.jarvisv2.databinding.ItemReceiverBinding
 import com.example.jarvisv2.databinding.ItemSenderBinding
-import com.example.jarvisv2.model.Chat
+import com.example.jarvisv2.models.Chat
+import com.example.jarvisv2.utils.copyToClipBoard
+import com.example.jarvisv2.utils.hideKeyBoard
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class ChatAdapter : ListAdapter<Chat, RecyclerView.ViewHolder>(DiffCallback()) {
+class ChatAdapter(private val onClickCallback:(message:String,view: View) -> Unit
+):
+    ListAdapter<Chat, RecyclerView.ViewHolder>(DiffCallback()) {
 
 
     class SenderViewHolder(private val itemSenderBinding: ItemSenderBinding) :
@@ -60,6 +65,14 @@ class ChatAdapter : ListAdapter<Chat, RecyclerView.ViewHolder>(DiffCallback()) {
             (holder as SenderViewHolder).bind(chat)
         }else{
             (holder as ReceiverViewHolder).bind(chat)
+        }
+        holder.itemView.setOnLongClickListener {
+            holder.itemView.context.hideKeyBoard(it)
+            if (holder.adapterPosition!= -1){
+                onClickCallback(chat.message,holder.itemView)
+
+            }
+            true
         }
     }
 

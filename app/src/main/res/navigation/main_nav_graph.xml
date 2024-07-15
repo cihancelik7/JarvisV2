@@ -27,15 +27,25 @@
         <action
             android:id="@+id/action_robotListScreenFragment_to_chatScreenFragment"
             app:destination="@id/chatScreenFragment"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"
+
             />
     </fragment>
     <fragment
         android:id="@+id/chatScreenFragment"
         android:name="com.example.jarvisv2.fragments.ChatScreenFragment"
         android:label="fragment_chat_screen"
-        tools:layout="@layout/fragment_chat_screen" />
+        tools:layout="@layout/fragment_chat_screen" >
+        <action
+            android:id="@+id/action_chatScreenFragment_to_selectTextScreenFragment"
+
+            app:destination="@id/selectTextScreenFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/selectTextScreenFragment"
+        android:name="com.example.jarvisv2.fragments.SelectTextScreenFragment"
+        android:label="fragment_select_text_screen"
+        tools:layout="@layout/fragment_select_text_screen" >
+        <argument android:name="selected_message"
+            app:argType="string" />
+    </fragment>
 </navigation>

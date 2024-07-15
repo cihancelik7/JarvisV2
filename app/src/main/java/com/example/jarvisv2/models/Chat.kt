@@ -1,4 +1,4 @@
-package com.example.jarvisv2.model
+package com.example.jarvisv2.models
 
 import java.util.Date
 
