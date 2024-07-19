@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.jarvisv2.models.Chat
 import com.example.jarvisv2.repository.ChatRepository
 
-class ChatViewModel(application: Application) :AndroidViewModel(application){
+class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
     private val chat_repository = ChatRepository()
 
@@ -21,9 +21,7 @@ class ChatViewModel(application: Application) :AndroidViewModel(application){
         chatList.postValue(modifiedChatList)
     }
 
-
-    fun createChatCompletion(message: String){
+    fun createChatCompletion(message: String) {
         chat_repository.create_chat_complation(message)
     }
-
 }

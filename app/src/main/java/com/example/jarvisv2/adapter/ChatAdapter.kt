@@ -10,7 +10,9 @@ import com.example.jarvisv2.databinding.ItemReceiverBinding
 import com.example.jarvisv2.databinding.ItemSenderBinding
 import com.example.jarvisv2.models.Chat
 import com.example.jarvisv2.utils.copyToClipBoard
+import com.example.jarvisv2.utils.gone
 import com.example.jarvisv2.utils.hideKeyBoard
+import com.example.jarvisv2.utils.visible
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -22,8 +24,8 @@ class ChatAdapter(private val onClickCallback:(message:String,view: View) -> Uni
     class SenderViewHolder(private val itemSenderBinding: ItemSenderBinding) :
         RecyclerView.ViewHolder(itemSenderBinding.root) {
         fun bind(chat: Chat) {
-            itemSenderBinding.txtMessage.text = chat.message
-            val data_format = SimpleDateFormat("dd-MMM-yyyy HH:mm a", Locale.getDefault())
+            itemSenderBinding.txtMessage.text = chat.message.content
+            val data_format = SimpleDateFormat("dd-MMM-yyyy hh:mm a", Locale.getDefault())
             itemSenderBinding.txtDate.text = data_format.format(chat.date)
         }
     }
@@ -31,9 +33,19 @@ class ChatAdapter(private val onClickCallback:(message:String,view: View) -> Uni
     class ReceiverViewHolder(private val itemReceiverBinding: ItemReceiverBinding) :
         RecyclerView.ViewHolder(itemReceiverBinding.root) {
         fun bind(chat: Chat) {
-            itemReceiverBinding.txtMessage.text = chat.message
-            val data_format = SimpleDateFormat("dd-MMM-yyyy HH:mm a", Locale.getDefault())
-            itemReceiverBinding.txtDate.text = data_format.format(chat.date)
+            if (chat.message.content.isNotEmpty()){
+                itemReceiverBinding.txtMessage.text = chat.message.content
+                val data_format = SimpleDateFormat("dd-MMM-yyyy hh:mm a", Locale.getDefault())
+                itemReceiverBinding.txtDate.text = data_format.format(chat.date)
+
+                itemReceiverBinding.typingLav.gone()
+                itemReceiverBinding.txtDate.visible()
+                itemReceiverBinding.txtMessage.visible()
+            }else{
+                itemReceiverBinding.txtDate.gone()
+                itemReceiverBinding.txtMessage.gone()
+                itemReceiverBinding.typingLav.visible()
+            }
         }
     }
 
@@ -61,7 +73,7 @@ class ChatAdapter(private val onClickCallback:(message:String,view: View) -> Uni
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val chat = getItem(position)
 
-        if (chat.message_type.equals("sender",true)){
+        if (chat.message.role == "user"){
             (holder as SenderViewHolder).bind(chat)
         }else{
             (holder as ReceiverViewHolder).bind(chat)
@@ -69,7 +81,7 @@ class ChatAdapter(private val onClickCallback:(message:String,view: View) -> Uni
         holder.itemView.setOnLongClickListener {
             holder.itemView.context.hideKeyBoard(it)
             if (holder.adapterPosition!= -1){
-                onClickCallback(chat.message,holder.itemView)
+                onClickCallback(chat.message.content,holder.itemView)
 
             }
             true
@@ -77,7 +89,7 @@ class ChatAdapter(private val onClickCallback:(message:String,view: View) -> Uni
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (getItem(position).message_type.equals("sender",true)){
+        return if (getItem(position).message.content == "user"){
             0 //Sender_item
         }else{
             1 // Receiver_item
