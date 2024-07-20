@@ -89,7 +89,7 @@ class ChatAdapter(private val onClickCallback:(message:String,view: View) -> Uni
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (getItem(position).message.content == "user"){
+        return if (getItem(position).message.role == "user"){
             0 //Sender_item
         }else{
             1 // Receiver_item

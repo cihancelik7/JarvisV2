@@ -1,59 +1,163 @@
 package com.example.jarvisv2.repository
 
+import android.app.Application
 import android.util.Log
+import android.widget.Toast
+import com.example.jarvisv2.database.ChatGPTDatabase
+import com.example.jarvisv2.models.Chat
 import com.example.jarvisv2.network.ApiClient
 import com.example.jarvisv2.response.ChatRequest
 import com.example.jarvisv2.response.ChatResponse
 import com.example.jarvisv2.response.Message
 import com.example.jarvisv2.utils.CHATGPT_MODEL
+import com.example.jarvisv2.utils.Resource
+import com.example.jarvisv2.utils.longToastShow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.Date
+import java.util.UUID
 
-class ChatRepository {
+class ChatRepository(val application: Application) {
+
+    private val chatDao = ChatGPTDatabase.getInstance(application).chatDao
+
     private val api_client = ApiClient.getInstance()
 
+
+    private val _chatStateFlow = MutableStateFlow<Resource<Flow<List<Chat>>>>(Resource.Loading())
+    val chatStateFlow: StateFlow<Resource<Flow<List<Chat>>>>
+        get() = _chatStateFlow
+
+    fun getChatList() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                _chatStateFlow.emit(Resource.Loading())
+                val result = async {
+                    delay(300)
+                    chatDao.getChatList()
+                }.await()
+
+                _chatStateFlow.emit(Resource.Success(result))
+            } catch (e: Exception) {
+                _chatStateFlow.emit(Resource.Error(e.message.toString()))
+            }
+        }
+    }
+
+
     fun create_chat_complation(message: String) {
-        try {
-            val chatRequest = ChatRequest(
-                arrayListOf(
-                    Message(
-                        "Hey there, I'm Jarvis, designed by Cihan. Here to turn complex problems into simple solutions. What's the topic of the day?",
-                        "system"
-                    ),
-                    Message(
-                        message,
-                        "user"
+        val receiverId = UUID.randomUUID().toString()
+        CoroutineScope(Dispatchers.IO).launch {
+            delay(200)
+            val senderId = UUID.randomUUID().toString()
+            try {
+                async {
+                    chatDao.insertChat(
+                        Chat(
+                            senderId,
+                            Message(
+                                message,
+                                "user"
+                            ),
+                            Date()
+                        )
                     )
-                ),
-                CHATGPT_MODEL
-            )
-            api_client.create_chat_completion(chatRequest).enqueue(object : Callback<ChatResponse> {
-                override fun onResponse(
-                    call: Call<ChatResponse>,
-                    response: Response<ChatResponse>
-                ) {
-                    val code = response.code()
-                    if (code == 200) {
-                        response.body()?.choices?.get(0)?.message?.let {
-                            Log.d("message", it.toString())
+                }.await()
+
+                val messageList = chatDao.getChatListWithOutFlow().map {
+                    it.message
+                }.reversed().toMutableList()
+
+                if(messageList.size==1){
+                    messageList.add(
+                        0,
+                        Message(
+                            "Hey there, I'm Jarvis, designed by Cihan. Here to turn complex problems into simple solutions. What's the topic of the day?",
+                            "system"
+                        )
+                    )
+                }
+                async {
+                    chatDao.insertChat(
+                        Chat(
+                            receiverId,
+                            Message(
+
+                                "",
+                                "assistant"
+                            ),
+                            Date()
+                        )
+                    )
+                }.await()
+
+
+
+                val chatRequest = ChatRequest(
+                    messageList,
+                    CHATGPT_MODEL
+                )
+                api_client.create_chat_completion(chatRequest)
+                    .enqueue(object : Callback<ChatResponse> {
+                        override fun onResponse(
+                            call: Call<ChatResponse>,
+                            response: Response<ChatResponse>
+                        ) {
+                            CoroutineScope(Dispatchers.IO).launch {
+                            val code = response.code()
+                            if (code == 200) {
+                                response.body()?.choices?.get(0)?.message?.let {
+                                    Log.d("message", it.toString())
+                                    chatDao.updateChatParticularField(
+                                        receiverId,
+                                        it.content,
+                                        it.role,
+                                        Date()
+                                    )
+                                }
+                            } else {
+                                Log.d("error", response.errorBody().toString())
+                                deleteChatIfApiFailure(receiverId,senderId)
+                            }
+                        }}
+
+                        override fun onFailure(call: Call<ChatResponse>, t: Throwable) {
+                            t.printStackTrace()
+                            deleteChatIfApiFailure(receiverId,senderId)
+
                         }
-                    } else {
-                        Log.d("error", response.errorBody().toString())
-                    }
-                }
 
-                override fun onFailure(call: Call<ChatResponse>, t: Throwable) {
-                    t.printStackTrace()
-                }
+                    })
 
-            })
+            } catch (e: Exception) {
+                e.printStackTrace()
+                deleteChatIfApiFailure(receiverId,senderId)
 
-        } catch (e: Exception) {
-            e.printStackTrace()
+            }
+        }
+    }
+
+    private fun deleteChatIfApiFailure(receiverId: String, senderId: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+        listOf(
+            async { chatDao.deleteChatUsingChatId(receiverId) },
+            async { chatDao.deleteChatUsingChatId(senderId) }
+        ).awaitAll()
+            withContext(Dispatchers.Main){
+                application.longToastShow("Something went wrong")
+            }
+      //      _chatStateFlow.emit(Resource.Error("Something went wrong"))
         }
     }
 }

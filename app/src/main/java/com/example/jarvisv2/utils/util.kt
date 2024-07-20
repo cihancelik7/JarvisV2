@@ -11,6 +11,12 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.transition.Visibility
 
+enum class Status{
+    LOADING,
+    SUCCESS,
+    ERROR
+}
+
 enum class NetworkStatus{
     Available,Unavailable
 }

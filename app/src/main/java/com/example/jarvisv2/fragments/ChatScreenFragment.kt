@@ -14,14 +14,21 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.jarvisv2.R
 import com.example.jarvisv2.adapter.ChatAdapter
 import com.example.jarvisv2.models.Chat
+import com.example.jarvisv2.utils.Status
 import com.example.jarvisv2.utils.copyToClipBoard
 import com.example.jarvisv2.utils.hideKeyBoard
 import com.example.jarvisv2.utils.longToastShow
 import com.example.jarvisv2.utils.shareMsg
 import com.example.jarvisv2.view_models.ChatViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.util.Date
 
 class ChatScreenFragment : Fragment() {
+
+
 
     private val chatViewModel: ChatViewModel by lazy {
         ViewModelProvider(this).get(ChatViewModel::class.java)
@@ -88,29 +95,50 @@ class ChatScreenFragment : Fragment() {
 
         }
         chat_rv.adapter = chat_adapter
-
+        chat_adapter.registerAdapterDataObserver(object:RecyclerView.AdapterDataObserver(){
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                super.onItemRangeInserted(positionStart, itemCount)
+                chat_rv.smoothScrollToPosition(positionStart)
+            }
+        })
         val send_image_btn = view.findViewById<ImageButton>(R.id.send_image_btn)
         val ed_message = view.findViewById<EditText>(R.id.ed_message)
-        // var counter = -1
+
         send_image_btn.setOnClickListener {
             view.context.hideKeyBoard(it)
             if (ed_message.text.toString().trim().isNotEmpty()) {
-                /*   counter += 1
-                if (counter >= chatList.size) {
-                    return@setOnClickListener
-                }
-                chatViewModel.insertChat(chatList[counter])*/
                 chatViewModel.createChatCompletion(ed_message.text.toString().trim())
+                ed_message.text = null
             } else {
                 view.context.longToastShow("Message is required")
             }
         }
 
-        chatViewModel.chatList.observe(viewLifecycleOwner) {
-            chat_adapter.submitList(it)
-            chat_rv.smoothScrollToPosition(it.size)
-        }
+        callGetChatList(chat_rv,chat_adapter)
+        chatViewModel.getChatList()
+
+
 
         return view
+    }
+
+    private fun callGetChatList(chatRv: RecyclerView, chatAdapter: ChatAdapter) {
+        CoroutineScope(Dispatchers.Main).launch {
+            chatViewModel
+                .chatStateFlow
+                .collectLatest {
+                    when(it.status){
+                        Status.LOADING ->{}
+                        Status.SUCCESS ->{
+                            it.data?.collect{chatList->
+                                chatAdapter.submitList(chatList)
+                            }
+                        }
+                        Status.ERROR ->{
+                            it.message?.let { it1 -> chatRv.context.longToastShow(it1) }
+                        }
+                    }
+                }
+        }
     }
 }
