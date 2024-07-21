@@ -7,17 +7,20 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.jarvisv2.converters.TypeConverter
 import com.example.jarvisv2.dao.ChatDao
+import com.example.jarvisv2.dao.RobotDao
 import com.example.jarvisv2.models.Chat
+import com.example.jarvisv2.models.Robot
 
 
 @Database(
-    entities = [Chat::class],
+    entities = [Chat::class,Robot::class],
     version = 1,
     exportSchema = false
 )
 @TypeConverters(TypeConverter::class)
 abstract class ChatGPTDatabase : RoomDatabase(){
     abstract val chatDao:ChatDao
+    abstract val robotDao:RobotDao
 
     companion object{
 

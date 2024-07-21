@@ -20,6 +20,9 @@ enum class Status{
 enum class NetworkStatus{
     Available,Unavailable
 }
+enum class StatusResult{
+    Added
+}
 
 fun View.gone(){
     visibility = View.GONE
