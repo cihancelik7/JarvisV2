@@ -1,6 +1,7 @@
 package com.example.jarvisv2.repository
 
 import android.app.Application
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.jarvisv2.database.ChatGPTDatabase
 import com.example.jarvisv2.models.Robot
@@ -15,21 +16,27 @@ class RobotRepository(application: Application) {
 
 
     private val _statusLiveData = MutableLiveData<Resource<StatusResult>>()
-    val _statusLiveData = LiveData<Resource<StatusResult>>()
+    val statusLiveData: LiveData<Resource<StatusResult>>
         get() = _statusLiveData
 
-    fun insertRobot(robot:Robot){
+
+    fun insertRobot(robot: Robot) {
         try {
-            _statusLiveData.postValue(Loading())
+            _statusLiveData.postValue(Resource.Loading())
             CoroutineScope(Dispatchers.IO).launch {
                 val result = robotDao.insertRobot(robot)
-                handleResult(result.toInt(),"Inserted robot successfully",StatusResult.Added)
+                handleResult(result.toInt(), "Inserted robot successfully", StatusResult.Added)
             }
-        }catch (e:Exception){
-
+        } catch (e: Exception) {
+            _statusLiveData.postValue(Resource.Error(e.message.toString()))
         }
     }
-    private fun handleResult(toInt: Int,s:String,Added:StatusResult){
 
+    private fun handleResult(result: Int, message: String, statusResult: StatusResult) {
+        if (result!=-1){
+            _statusLiveData.postValue(Resource.Success(statusResult,message))
+        }else{
+            _statusLiveData.postValue(Resource.Error("Somethıng went wrong"))
+        }
     }
 }
