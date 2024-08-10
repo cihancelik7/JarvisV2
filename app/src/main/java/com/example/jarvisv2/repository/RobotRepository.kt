@@ -23,9 +23,13 @@ class RobotRepository(application: Application) {
         get() = _robotStateFlow
 
 
-    private val _statusLiveData = MutableLiveData<Resource<StatusResult>>()
-    val statusLiveData: LiveData<Resource<StatusResult>>
+    private val _statusLiveData = MutableLiveData<Resource<StatusResult>?>()
+    val statusLiveData: LiveData<Resource<StatusResult>?>
         get() = _statusLiveData
+
+    fun clearStatusLiveData(){
+        _statusLiveData.value = null
+    }
 
 
     fun getRobotList(){

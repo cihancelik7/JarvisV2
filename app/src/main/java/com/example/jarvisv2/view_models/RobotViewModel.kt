@@ -14,7 +14,10 @@ class RobotViewModel(application: Application):AndroidViewModel(application) {
     fun insertRobot(robot:Robot){
         robotRepository.insertRobot(robot)
     }
-    fun getRobotList(robot:Robot){
+    fun clearStatusLiveData(){
+        robotRepository.clearStatusLiveData()
+    }
+    fun getRobotList(){
         robotRepository.getRobotList()
     }
     fun updateRobot(robot:Robot){

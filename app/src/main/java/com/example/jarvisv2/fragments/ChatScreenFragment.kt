@@ -7,17 +7,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.PopupMenu
+import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import com.example.jarvisv2.R
 import com.example.jarvisv2.adapter.ChatAdapter
-import com.example.jarvisv2.models.Chat
 import com.example.jarvisv2.utils.Status
 import com.example.jarvisv2.utils.copyToClipBoard
 import com.example.jarvisv2.utils.hideKeyBoard
 import com.example.jarvisv2.utils.longToastShow
+import com.example.jarvisv2.utils.robotImageList
 import com.example.jarvisv2.utils.shareMsg
 import com.example.jarvisv2.view_models.ChatViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -34,12 +37,26 @@ class ChatScreenFragment : Fragment() {
         ViewModelProvider(this).get(ChatViewModel::class.java)
     }
 
+    private val chatArgs : ChatScreenFragmentArgs by navArgs()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_chat_screen, container, false)
+
+
+        val tool_bar_view = view.findViewById<View>(R.id.toolbarLayout)
+
+        val close_image = tool_bar_view.findViewById<ImageView>(R.id.back_img)
+        val robotImage = tool_bar_view.findViewById<ImageView>(R.id.robot_image)
+        robotImage.setImageResource(robotImageList[chatArgs.robotimage])
+        close_image.setOnClickListener {
+            findNavController().navigateUp()
+        }
+        val titleTxt = tool_bar_view.findViewById<TextView>(R.id.titleTxt)
+        titleTxt.text = chatArgs.robotName
 
         val chat_rv = view.findViewById<RecyclerView>(R.id.chat_rv)
         val chat_adapter = ChatAdapter() { message, text_view ->
@@ -107,7 +124,7 @@ class ChatScreenFragment : Fragment() {
         send_image_btn.setOnClickListener {
             view.context.hideKeyBoard(it)
             if (ed_message.text.toString().trim().isNotEmpty()) {
-                chatViewModel.createChatCompletion(ed_message.text.toString().trim())
+                chatViewModel.createChatCompletion(ed_message.text.toString().trim(),chatArgs.robotId)
                 ed_message.text = null
             } else {
                 view.context.longToastShow("Message is required")
@@ -115,7 +132,7 @@ class ChatScreenFragment : Fragment() {
         }
 
         callGetChatList(chat_rv,chat_adapter)
-        chatViewModel.getChatList()
+        chatViewModel.getChatList(chatArgs.robotId)
 
 
 

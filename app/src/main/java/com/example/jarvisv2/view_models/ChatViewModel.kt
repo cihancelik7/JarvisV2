@@ -13,10 +13,10 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
 
 
-    fun createChatCompletion(message: String) {
-        chat_repository.create_chat_complation(message)
+    fun createChatCompletion(message: String,robotId:String) {
+        chat_repository.create_chat_complation(message,robotId)
     }
-    fun getChatList(){
-        chat_repository.getChatList()
+    fun getChatList(robotId : String){
+        chat_repository.getChatList(robotId)
     }
 }

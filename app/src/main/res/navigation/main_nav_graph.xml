@@ -39,6 +39,15 @@
             android:id="@+id/action_chatScreenFragment_to_selectTextScreenFragment"
 
             app:destination="@id/selectTextScreenFragment" />
+        <argument
+            android:name="robotId"
+            app:argType="string" />
+        <argument
+            android:name="robotimage"
+            app:argType="integer" />
+        <argument
+            android:name="robotName"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/selectTextScreenFragment"

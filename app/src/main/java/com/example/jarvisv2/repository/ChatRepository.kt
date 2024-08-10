@@ -39,13 +39,13 @@ class ChatRepository(val application: Application) {
     val chatStateFlow: StateFlow<Resource<Flow<List<Chat>>>>
         get() = _chatStateFlow
 
-    fun getChatList() {
+    fun getChatList(robotId: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 _chatStateFlow.emit(Resource.Loading())
                 val result = async {
                     delay(300)
-                    chatDao.getChatList()
+                    chatDao.getChatList(robotId)
                 }.await()
 
                 _chatStateFlow.emit(Resource.Success(result))
@@ -56,7 +56,7 @@ class ChatRepository(val application: Application) {
     }
 
 
-    fun create_chat_complation(message: String) {
+    fun create_chat_complation(message: String,robotId: String) {
         val receiverId = UUID.randomUUID().toString()
         CoroutineScope(Dispatchers.IO).launch {
             delay(200)
@@ -70,12 +70,13 @@ class ChatRepository(val application: Application) {
                                 message,
                                 "user"
                             ),
+                            robotId,
                             Date()
                         )
                     )
                 }.await()
 
-                val messageList = chatDao.getChatListWithOutFlow().map {
+                val messageList = chatDao.getChatListWithOutFlow(robotId).map {
                     it.message
                 }.reversed().toMutableList()
 
@@ -97,6 +98,7 @@ class ChatRepository(val application: Application) {
                                 "",
                                 "assistant"
                             ),
+                            robotId,
                             Date()
                         )
                     )
