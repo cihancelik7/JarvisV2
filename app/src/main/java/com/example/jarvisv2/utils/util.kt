@@ -10,6 +10,16 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.transition.Visibility
+import com.example.jarvisv2.R
+
+ val robotImageList = listOf(
+    R.drawable.robot_hi,
+    R.drawable.robot_img,
+    R.drawable.robot_pose,
+    R.drawable.robot_dance,
+    R.drawable.soldier_robot,
+    R.drawable.robot_hitmen
+)
 
 enum class Status{
     LOADING,
@@ -21,7 +31,9 @@ enum class NetworkStatus{
     Available,Unavailable
 }
 enum class StatusResult{
-    Added
+    Added,
+    Updated,
+    Deleted
 }
 
 fun View.gone(){

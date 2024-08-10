@@ -8,9 +8,19 @@ import com.example.jarvisv2.repository.RobotRepository
 class RobotViewModel(application: Application):AndroidViewModel(application) {
 
     private val robotRepository = RobotRepository(application)
+    val robotStateFlow get() = robotRepository.robotStateFlow
     val statusLiveData get() = robotRepository.statusLiveData
 
     fun insertRobot(robot:Robot){
         robotRepository.insertRobot(robot)
+    }
+    fun getRobotList(robot:Robot){
+        robotRepository.getRobotList()
+    }
+    fun updateRobot(robot:Robot){
+        robotRepository.updateRobot(robot)
+    }
+    fun deleteRobotUsingId(robotId:String){
+        robotRepository.deleteRobotUsingId(robotId)
     }
 }
