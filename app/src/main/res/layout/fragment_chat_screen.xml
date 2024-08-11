@@ -31,8 +31,21 @@
         android:layout_marginVertical="4dp"
         android:layout_centerHorizontal="true"
         >
+
+
+        <ImageButton
+            android:id="@+id/voiceToTextBtn"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_edittext"
+            android:src="@drawable/voice"
+            />
         <EditText
             android:id="@+id/ed_message"
+            android:layout_toEndOf="@+id/voiceToTextBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"

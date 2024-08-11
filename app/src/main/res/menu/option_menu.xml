@@ -9,6 +9,10 @@
         android:title="Select Text"
         android:icon="@drawable/ic_select_all"
         />
+    <item android:id="@+id/textToVoiceMenu"
+        android:title="Text to Voice"
+        android:icon="@drawable/voice"
+        />
     <item android:id="@+id/share_txt_menu"
         android:title="Share"
         android:icon="@drawable/ic_share"
