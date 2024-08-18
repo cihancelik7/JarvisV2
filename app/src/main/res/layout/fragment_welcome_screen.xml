@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
 
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent"
     android:background="@color/mainBackgroundColor"
     tools:context=".fragments.WelcomeScreenFragment">
 
@@ -14,63 +14,87 @@
         android:layout_height="200dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        app:mwhVelocity="3"
-        app:mwhProgress="1"
-        app:mwhGradientAngle="45"
-        app:mwhWaveHeight="50dp"
-        app:mwhColorAlpha="0.45"
-        app:mwhStartColor="#04293A"
         app:mwhCloseColor="#1A4559"
-        app:mwhWaves="MultiWave"/>
+        app:mwhColorAlpha="0.45"
+        app:mwhGradientAngle="45"
+        app:mwhProgress="1"
+        app:mwhStartColor="#04293A"
+        app:mwhVelocity="3"
+        app:mwhWaveHeight="50dp"
+        app:mwhWaves="MultiWave" />
+
     <TextView
         android:id="@+id/titleTxt"
-        android:fontFamily="@font/ubuntu_mono_regular"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="24dp"
+        android:fontFamily="@font/ubuntu_mono_regular"
         android:text="Jarvis V2"
         android:textColor="@color/white"
-        android:textStyle="bold"
-        android:textSize="40sp"/>
+        android:textSize="40sp"
+        android:textStyle="bold" />
+
     <TextView
         android:id="@+id/descrTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/titleTxt"
-        android:fontFamily="@font/ubuntu_mono_regular"
-        android:textStyle="bold"
         android:layout_centerHorizontal="true"
         android:layout_margin="12dp"
+        android:fontFamily="@font/ubuntu_mono_regular"
         android:text="Welcome to Jarvis V2, your personal assistant that's as smart as Cihan and just as charming."
         android:textAlignment="center"
         android:textColor="@color/white"
-        android:textSize="16sp"/>
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
     <com.airbnb.lottie.LottieAnimationView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@id/typeAll"
         android:layout_below="@id/descrTxt"
-        android:layout_above="@id/continueBtn"
         android:layout_centerHorizontal="true"
         android:layout_margin="16dp"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
-        app:lottie_rawRes="@raw/robotanimation"/>
-    <androidx.appcompat.widget.AppCompatButton
-        android:background="@drawable/textviewbackground"
-        android:id="@+id/continueBtn"
+        app:lottie_rawRes="@raw/robotanimation" />
+
+    <LinearLayout
+        android:id="@+id/typeAll"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_alignParentBottom="true"
+        android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="16dp"
-        android:textStyle="bold"
-        android:text="Continue"
         android:layout_marginHorizontal="16dp"
-        android:textColor="@color/white"
-        android:textSize="24sp"
-        android:fontFamily="@font/ubuntu_mono_regular"/>
+        android:layout_marginBottom="8dp"
+        android:layout_alignParentBottom="true"
+
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/chatBtn"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            android:background="@drawable/textviewbackground"
+            android:fontFamily="@font/ubuntu_mono_regular"
+            android:text="Chat"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/generateImageBtn"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            android:background="@drawable/textviewbackground"
+            android:fontFamily="@font/ubuntu_mono_regular"
+            android:text="Genereate Image"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+
+    </LinearLayout>
+
 
 
 </RelativeLayout>

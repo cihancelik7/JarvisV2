@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/mainBackgroundColor"
+    android:orientation="vertical"
+    tools:context=".fragments.ImageGenScreenFragment">
+
+    <include
+        android:id="@+id/toolbar_layout"
+        layout="@layout/toolbar_layout" />
+
+
+    <EditText
+        android:id="@+id/ed_prompt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="8dp"
+        android:background="@drawable/bg_edittext"
+        android:hint="You're an artist and i am an art, Lets draw! "
+        android:inputType="textMultiLine"
+        android:maxLines="5"
+        android:minHeight="50dp"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="4dp"
+        android:scrollbars="vertical"
+        android:textAlignment="viewStart"
+        android:textColor="#03A9F4"
+        android:textColorHint="#03A9F4"
+        android:textSize="16sp" />
+
+    <RadioGroup
+        android:id="@+id/imageSizeRG"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="8dp"
+        android:background="@drawable/bg_edittext"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/radioBtn1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/radio_selector"
+            android:button="@android:color/transparent"
+            android:checked="true"
+            android:gravity="center"
+            android:text="256x256"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <RadioButton
+            android:id="@+id/radioBtn2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/radio_selector"
+            android:button="@android:color/transparent"
+            android:checked="false"
+            android:gravity="center"
+            android:text="512x512"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+        <RadioButton
+            android:id="@+id/radioBtn3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/radio_selector"
+            android:button="@android:color/transparent"
+            android:checked="false"
+            android:gravity="center"
+            android:text="1024x1024"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    </RadioGroup>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="8dp"
+        android:layout_marginHorizontal="16dp"
+        android:hint="Number of Images to Create"
+        style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu">
+
+        <AutoCompleteTextView
+            android:id="@+id/numberListACT"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:inputType="none"
+            android:text="2"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/generateImageBtn"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:background="@drawable/textviewbackground"
+        android:fontFamily="@font/ubuntu_mono_regular"
+        android:text="Genereate"
+        android:textColor="@color/white"
+        android:layout_marginVertical="8dp"
+        android:layout_marginHorizontal="16dp"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+
+</LinearLayout>

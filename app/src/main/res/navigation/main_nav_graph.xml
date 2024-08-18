@@ -18,6 +18,9 @@
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right"
             />
+        <action
+            android:id="@+id/action_welcomeScreenFragment_to_imageGenScreenFragment"
+            app:destination="@id/imageGenScreenFragment" />
     </fragment>
     <fragment
         android:id="@+id/robotListScreenFragment"
@@ -57,4 +60,9 @@
         <argument android:name="selected_message"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/imageGenScreenFragment"
+        android:name="com.example.jarvisv2.fragments.ImageGenScreenFragment"
+        android:label="fragment_image_gen_screen"
+        tools:layout="@layout/fragment_image_gen_screen" />
 </navigation>

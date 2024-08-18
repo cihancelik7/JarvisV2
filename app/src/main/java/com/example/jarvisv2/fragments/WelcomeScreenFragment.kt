@@ -21,15 +21,28 @@ class WelcomeScreenFragment : Fragment() {
         // Inflate the layout for this fragment
         val  view = inflater.inflate(R.layout.fragment_welcome_screen, container, false)
 
-        val continueBtn = view.findViewById<Button>(R.id.continueBtn).apply {
+        val chatBtn = view.findViewById<Button>(R.id.chatBtn).apply {
             startAnimation(
                 AnimationUtils.loadAnimation(view.context,R.anim.zoom_in_cut)
             )
         }
-        continueBtn.setOnClickListener {
+        val generateImageBtn = view.findViewById<Button>(R.id.generateImageBtn).apply {
+            startAnimation(
+                AnimationUtils.loadAnimation(view.context,R.anim.zoom_in_cut)
+            )
+        }
+        chatBtn.setOnClickListener {
             val action =
                 WelcomeScreenFragmentDirections
                     .actionWelcomeScreenFragmentToRobotListScreenFragment()
+            findNavController().navigate(action)
+        }
+
+
+        generateImageBtn.setOnClickListener {
+            val action =
+                WelcomeScreenFragmentDirections
+                    .actionWelcomeScreenFragmentToImageGenScreenFragment()
             findNavController().navigate(action)
         }
 
