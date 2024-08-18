@@ -17,11 +17,13 @@ import com.example.jarvisv2.MainActivity
 import com.example.jarvisv2.R
 import com.example.jarvisv2.adapter.RobotAdapter
 import com.example.jarvisv2.models.Robot
+import com.example.jarvisv2.utils.EncryptSharedPreferenceManager
 import com.example.jarvisv2.utils.Status
 import com.example.jarvisv2.utils.StatusResult
 import com.example.jarvisv2.utils.gone
 import com.example.jarvisv2.utils.longToastShow
 import com.example.jarvisv2.utils.robotImageList
+import com.example.jarvisv2.utils.visible
 import com.example.jarvisv2.view_models.RobotViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -47,6 +49,10 @@ class RobotListScreenFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_robot_list_screen, container, false)
 
+        try {
+
+
+
         val tool_bar_view = view.findViewById<View>(R.id.toolbarLayout)
 
         val robot_image_ll = tool_bar_view.findViewById<View>(R.id.robot_image_ll)
@@ -58,12 +64,27 @@ class RobotListScreenFragment : Fragment() {
         }
 
         val title_txt = tool_bar_view.findViewById<TextView>(R.id.titleTxt)
-        title_txt.text = "ChatGPT App"
+        title_txt.text = "Jarvis V2"
+
+            }catch (e:Exception){
+                e.printStackTrace()
+            }
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        try {
+
+            val settingImg = view.findViewById<ImageView>(R.id.setting_img)
+
+            settingImg.visible()
+            val encryptedPreferenceManager = EncryptSharedPreferenceManager(view.context)
+            settingImg.setOnClickListener {
+                apiKeyDialog(it,encryptedPreferenceManager)
+
+            }
+
         val addRobotFabBtn = view.findViewById<ExtendedFloatingActionButton>(R.id.addRobotFabBtn)
 
         addRobotFabBtn.setOnClickListener {
@@ -83,15 +104,19 @@ class RobotListScreenFragment : Fragment() {
                 }
 
                 else -> {
+                    if (encryptedPreferenceManager.openAPIKey.trim().isNotEmpty()){
+                        val action =
+                            RobotListScreenFragmentDirections
+                                .actionRobotListScreenFragmentToChatScreenFragment(
+                                    robot.robotId,
+                                    robot.robotImg,
+                                    robot.robotName
+                                )
+                        findNavController().navigate(action)
+                    }else{
+                        view.context.longToastShow("Enter the Api Key Setting Icom Click")
+                    }
 
-                    val action =
-                        RobotListScreenFragmentDirections
-                            .actionRobotListScreenFragmentToChatScreenFragment(
-                                robot.robotId,
-                                robot.robotImg,
-                                robot.robotName
-                            )
-                    findNavController().navigate(action)
                 }
             }
 
@@ -108,6 +133,9 @@ class RobotListScreenFragment : Fragment() {
         callGetRobotList(robotAdapter,view)
         robotViewModel.getRobotList()
         statusCallBack(view)
+        }catch (e:Exception){
+            e.printStackTrace()
+        }
     }
 
     private fun callGetRobotList(robotAdapter: RobotAdapter, view: View) {
@@ -246,6 +274,42 @@ class RobotListScreenFragment : Fragment() {
             .setNegativeButton("Cancel", null)
             .create()
             .show()
+    }
+    private fun apiKeyDialog(view: View,encryptSharedPreferenceManager: EncryptSharedPreferenceManager) {
+        val edApiKey  = TextInputEditText(view.context)
+        edApiKey.hint = "Enter Api Key"
+        edApiKey.maxLines = 3
+
+        val textInputLayout = TextInputLayout(view.context)
+        val container = FrameLayout(view.context)
+        val params = FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        params.setMargins(50, 30, 50, 30)
+        textInputLayout.layoutParams = params
+
+        textInputLayout.addView(edApiKey)
+        container.addView(textInputLayout)
+
+        MaterialAlertDialogBuilder(view.context)
+            .setTitle("Open API Key")
+            .setView(container)
+            .setCancelable(false)
+            .setPositiveButton("Update") { dialog, which ->
+                val apiKey = edApiKey.text.toString().trim()
+                if (apiKey.isNotEmpty()) {
+                   encryptSharedPreferenceManager.openAPIKey = apiKey
+                } else {
+                    view.context.longToastShow("Required")
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .create()
+            .show()
+        if (encryptSharedPreferenceManager.openAPIKey.trim().isNotEmpty()){
+            edApiKey.setText(encryptSharedPreferenceManager.openAPIKey.trim())
+        }
     }
 
 }

@@ -10,6 +10,7 @@ import com.example.jarvisv2.response.ChatRequest
 import com.example.jarvisv2.response.ChatResponse
 import com.example.jarvisv2.response.Message
 import com.example.jarvisv2.utils.CHATGPT_MODEL
+import com.example.jarvisv2.utils.EncryptSharedPreferenceManager
 import com.example.jarvisv2.utils.Resource
 import com.example.jarvisv2.utils.longToastShow
 import kotlinx.coroutines.CoroutineScope
@@ -33,6 +34,7 @@ class ChatRepository(val application: Application) {
     private val chatDao = ChatGPTDatabase.getInstance(application).chatDao
 
     private val api_client = ApiClient.getInstance()
+    private val encryptSharedPreferenceManager = EncryptSharedPreferenceManager(application)
 
 
     private val _chatStateFlow = MutableStateFlow<Resource<Flow<List<Chat>>>>(Resource.Loading())
@@ -110,7 +112,8 @@ class ChatRepository(val application: Application) {
                     messageList,
                     CHATGPT_MODEL
                 )
-                api_client.create_chat_completion(chatRequest)
+                api_client.create_chat_completion(chatRequest,
+                    authorization = "Bearer ${encryptSharedPreferenceManager.openAPIKey}")
                     .enqueue(object : Callback<ChatResponse> {
                         override fun onResponse(
                             call: Call<ChatResponse>,

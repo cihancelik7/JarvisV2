@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.jarvisv2.database.ChatGPTDatabase
 import com.example.jarvisv2.models.Robot
+import com.example.jarvisv2.utils.EncryptSharedPreferenceManager
 import com.example.jarvisv2.utils.Resource
 import com.example.jarvisv2.utils.StatusResult
 import kotlinx.coroutines.CoroutineScope
@@ -17,7 +18,6 @@ import kotlinx.coroutines.launch
 
 class RobotRepository(application: Application) {
     private val robotDao = ChatGPTDatabase.getInstance(application).robotDao
-
     private val _robotStateFlow = MutableStateFlow<Resource<Flow<List<Robot>>>>(Resource.Loading())
     val robotStateFlow: StateFlow<Resource<Flow<List<Robot>>>>
         get() = _robotStateFlow

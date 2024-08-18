@@ -36,9 +36,9 @@
         android:id="@+id/titleTxt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:layout_marginHorizontal="10dp"
+        android:layout_toStartOf="@id/setting_img"
         android:layout_toEndOf="@+id/robot_image_ll"
         android:fontFamily="@font/ubuntu_mono_regular"
         android:singleLine="true"
@@ -46,5 +46,16 @@
         android:textSize="20sp"
         android:textStyle="bold"
         tools:text="Jarvis V2" />
+
+    <ImageView
+        android:id="@+id/setting_img"
+        android:layout_width="30dp"
+        android:visibility="gone"
+        android:layout_height="30dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="16dp"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:src="@drawable/ic_settings" />
 
 </RelativeLayout>
