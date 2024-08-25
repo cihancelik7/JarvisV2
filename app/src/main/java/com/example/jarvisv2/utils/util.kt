@@ -1,18 +1,24 @@
 package com.example.jarvisv2.utils
 
+import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Context.INPUT_METHOD_SERVICE
+import android.content.DialogInterface
 import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.transition.Visibility
 import com.example.jarvisv2.R
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
- val robotImageList = listOf(
+val robotImageList = listOf(
     R.drawable.robot_hi,
     R.drawable.robot_img,
     R.drawable.robot_pose,
@@ -70,4 +76,33 @@ fun Context.longToastShow(message: String){
     intent.type = "text/plain"
     intent.putExtra(Intent.EXTRA_TEXT,message)
     startActivity(Intent.createChooser(intent,"Share Message"))
+}
+
+fun Dialog.setupDialog(layoutResId : Int){
+    setContentView(layoutResId)
+    window!!.setLayout(
+        LinearLayout.LayoutParams.MATCH_PARENT,
+        LinearLayout.LayoutParams.WRAP_CONTENT
+    )
+    setCancelable(false)
+}
+fun appSettingOpen(context: Context){
+    Toast.makeText(
+        context,
+        "Go to Setting and Enable All Permission",
+        Toast.LENGTH_LONG
+    ).show()
+
+    val settingIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+    settingIntent.data = Uri.parse("package:${context.packageName}")
+    context.startActivity(settingIntent)
+}
+
+fun warningPermissionDialog(context: Context,listener : DialogInterface.OnClickListener){
+    MaterialAlertDialogBuilder(context)
+        .setMessage("All Permission are Required for this app")
+        .setCancelable(false)
+        .setPositiveButton("Ok",listener)
+        .create()
+        .show()
 }

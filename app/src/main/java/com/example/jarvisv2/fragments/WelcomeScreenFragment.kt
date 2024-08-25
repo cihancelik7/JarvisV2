@@ -9,6 +9,8 @@ import android.view.animation.AnimationUtils
 import android.widget.Button
 import androidx.navigation.fragment.findNavController
 import com.example.jarvisv2.R
+import com.example.jarvisv2.utils.EncryptSharedPreferenceManager
+import com.example.jarvisv2.utils.longToastShow
 
 class WelcomeScreenFragment : Fragment() {
 
@@ -38,12 +40,16 @@ class WelcomeScreenFragment : Fragment() {
             findNavController().navigate(action)
         }
 
-
+    val encryptSharedPreferenceManager = EncryptSharedPreferenceManager(view.context)
         generateImageBtn.setOnClickListener {
-            val action =
-                WelcomeScreenFragmentDirections
-                    .actionWelcomeScreenFragmentToImageGenScreenFragment()
-            findNavController().navigate(action)
+            if (encryptSharedPreferenceManager.openAPIKey.trim().isNotEmpty()) {
+                val action =
+                    WelcomeScreenFragmentDirections
+                        .actionWelcomeScreenFragmentToImageGenScreenFragment()
+                findNavController().navigate(action)
+            }else{
+                view.context.longToastShow("Enter the Api Key Setting Icom Click")
+            }
         }
 
         return view
