@@ -22,14 +22,14 @@ JarvisV2 is an AI assistant that uses OpenAI's ChatGPT API to create multiple ro
 ## Requirements
 
   •	Android SDK 24+
-	•	OpenAI API Key
-	•	Kotlin 1.8+
+  •	OpenAI API Key
+  •	Kotlin 1.8+
 
 ## Libraries Used
 
   •	Retrofit: For networking and API requests
-	•	Room: For local database storage
-	•	Glide: For image loading
-	•	Lottie: For animations
-	•	MultiWaveHeader: For wave animations in UI
-	•	Navigation Component: For multi-screen navigation
+  •	Room: For local database storage
+  •	Glide: For image loading
+  •	Lottie: For animations
+  •	MultiWaveHeader: For wave animations in UI
+  •	Navigation Component: For multi-screen navigation
