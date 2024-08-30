@@ -22,29 +22,26 @@ class RobotRepository(application: Application) {
     val robotStateFlow: StateFlow<Resource<Flow<List<Robot>>>>
         get() = _robotStateFlow
 
-
     private val _statusLiveData = MutableLiveData<Resource<StatusResult>?>()
     val statusLiveData: LiveData<Resource<StatusResult>?>
         get() = _statusLiveData
 
-    fun clearStatusLiveData(){
+    fun clearStatusLiveData() {
         _statusLiveData.value = null
     }
 
-
-    fun getRobotList(){
+    fun getRobotList() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 _robotStateFlow.emit(Resource.Loading())
                 val result = robotDao.getRobotList()
                 _robotStateFlow.emit(Resource.Success(result))
-            }catch (e:Exception){
+            } catch (e: Exception) {
                 e.printStackTrace()
                 _robotStateFlow.emit(Resource.Error(e.message.toString()))
             }
         }
     }
-
 
     fun insertRobot(robot: Robot) {
         try {
@@ -57,6 +54,7 @@ class RobotRepository(application: Application) {
             _statusLiveData.postValue(Resource.Error(e.message.toString()))
         }
     }
+
     fun deleteRobotUsingId(robotId: String) {
         try {
             _statusLiveData.postValue(Resource.Loading())
@@ -69,14 +67,12 @@ class RobotRepository(application: Application) {
                     robotDao.deleteRobotUsingId(robotId)
                 }.await()
 
-
                 handleResult(result, "Deleted robot and Chat successfully", StatusResult.Deleted)
             }
         } catch (e: Exception) {
             _statusLiveData.postValue(Resource.Error(e.message.toString()))
         }
     }
-
 
     fun updateRobot(robot: Robot) {
         try {
@@ -91,9 +87,9 @@ class RobotRepository(application: Application) {
     }
 
     private fun handleResult(result: Int, message: String, statusResult: StatusResult) {
-        if (result!=-1){
-            _statusLiveData.postValue(Resource.Success(statusResult,message))
-        }else{
+        if (result != -1) {
+            _statusLiveData.postValue(Resource.Success(statusResult, message))
+        } else {
             _statusLiveData.postValue(Resource.Error("Somethıng went wrong"))
         }
     }

@@ -1,5 +1,6 @@
 package com.example.jarvisv2.repository
 
+import FirebaseRepository
 import android.app.Application
 import android.util.Log
 import android.widget.Toast
@@ -16,6 +17,8 @@ import com.example.jarvisv2.utils.CHATGPT_MODEL
 import com.example.jarvisv2.utils.EncryptSharedPreferenceManager
 import com.example.jarvisv2.utils.Resource
 import com.example.jarvisv2.utils.longToastShow
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -37,10 +40,12 @@ import kotlin.math.E
 class ChatRepository(val application: Application) {
 
     private val chatDao = ChatGPTDatabase.getInstance(application).chatDao
+    private val firebaseRepository = FirebaseRepository()
+    private val databaseReference = FirebaseDatabase.getInstance().reference  // Firebase bağlantısı
+
 
     private val api_client = ApiClient.getInstance()
     private val encryptSharedPreferenceManager = EncryptSharedPreferenceManager(application)
-
 
     private val _chatStateFlow = MutableStateFlow<Resource<Flow<List<Chat>>>>(Resource.Loading())
     val chatStateFlow: StateFlow<Resource<Flow<List<Chat>>>>
@@ -50,8 +55,23 @@ class ChatRepository(val application: Application) {
     val imageStateFlow: StateFlow<Resource<ImageResponse>>
         get() = _imageStateFlow
 
-    private val imageList = ArrayList<Data>()
 
+    private val imageList = ArrayList<Data>()
+    fun createUserSpecificChat(email: String, message: String) {
+        firebaseRepository.addChat(email, message, "user")
+    }
+
+    fun createUserSpecificImage(email: String, imageUrl: String) {
+        firebaseRepository.addImage(email, imageUrl)
+    }
+
+    fun getUserChats(email: String): DatabaseReference {
+        return firebaseRepository.getUserChats(email)
+    }
+
+    fun getUserImages(email: String): DatabaseReference {
+        return firebaseRepository.getUserImages(email)
+    }
 
     fun getChatList(robotId: String) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -69,7 +89,12 @@ class ChatRepository(val application: Application) {
         }
     }
 
-
+    fun createUserSpecificCategory(email: String) {
+        val formattedEmail = email.replace(".", "")  // Firebase key için mail adresi formatlama
+        val userCategoryRef = databaseReference.child("users").child(formattedEmail)
+        userCategoryRef.child("chat").setValue(true)
+        userCategoryRef.child("image").setValue(true)
+    }
     fun create_chat_complation(message: String, robotId: String) {
         val receiverId = UUID.randomUUID().toString()
         CoroutineScope(Dispatchers.IO).launch {
