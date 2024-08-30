@@ -178,7 +178,7 @@ class ChatRepository(val application: Application) {
             }
             //      _chatStateFlow.emit(Resource.Error("Something went wrong"))
         }
-    }
+        }
         fun create_image(body: CreateImageRequest) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
