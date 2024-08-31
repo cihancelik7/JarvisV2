@@ -2,8 +2,11 @@ package com.example.jarvisv2.repository
 
 import com.example.jarvisv2.models.Robot
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import java.security.MessageDigest
 
 class FirebaseRepository {
@@ -27,14 +30,41 @@ class FirebaseRepository {
         val uid = getUserUid()
         val userCategoryRef = database.getReference("users/$uid")
 
-        // Chat kategorisi oluştur
-        userCategoryRef.child("chats").setValue(true)
+        userCategoryRef.child("chats").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (!snapshot.exists()) {
+                    userCategoryRef.child("chats").setValue(true)
+                }
+            }
 
-        // Image kategorisi oluştur
-        userCategoryRef.child("images").setValue(true)
+            override fun onCancelled(error: DatabaseError) {
+                // Hata durumunda yapılacak işlemler
+            }
+        })
 
-        // Robots kategorisi oluştur
-        userCategoryRef.child("robots").setValue(true)
+        userCategoryRef.child("images").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (!snapshot.exists()) {
+                    userCategoryRef.child("images").setValue(true)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Hata durumunda yapılacak işlemler
+            }
+        })
+
+        userCategoryRef.child("robots").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (!snapshot.exists()) {
+                    userCategoryRef.child("robots").setValue(true)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Hata durumunda yapılacak işlemler
+            }
+        })
     }
 
     // Robot ekleme fonksiyonu
