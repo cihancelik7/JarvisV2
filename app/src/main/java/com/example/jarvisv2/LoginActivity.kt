@@ -5,14 +5,14 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.jarvisv2.databinding.ActivityLoginBinding
+import com.example.jarvisv2.repository.FirebaseRepository
 import com.google.firebase.auth.FirebaseAuth
-import FirebaseRepository // FirebaseRepository'yi dahil edin
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
     private lateinit var auth: FirebaseAuth
-    private lateinit var firebaseRepository: FirebaseRepository  // FirebaseRepository'yi tanımla
+    private lateinit var firebaseRepository: FirebaseRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,7 +20,7 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         auth = FirebaseAuth.getInstance()
-        firebaseRepository = FirebaseRepository()  // FirebaseRepository'yi başlat
+        firebaseRepository = FirebaseRepository()
 
         binding.loginButton.setOnClickListener {
             val email = binding.emailEditText.text.toString()
@@ -31,7 +31,7 @@ class LoginActivity : AppCompatActivity() {
                     .addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
                             // Giriş başarılı, kullanıcıya özel kategorileri oluştur
-                            firebaseRepository.createUserSpecificCategory(email)
+                            firebaseRepository.createUserSpecificCategory()
 
                             // Ana ekrana geç
                             val intent = Intent(this, MainActivity::class.java)

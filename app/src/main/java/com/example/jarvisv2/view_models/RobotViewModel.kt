@@ -5,25 +5,33 @@ import androidx.lifecycle.AndroidViewModel
 import com.example.jarvisv2.models.Robot
 import com.example.jarvisv2.repository.RobotRepository
 
-class RobotViewModel(application: Application):AndroidViewModel(application) {
+class RobotViewModel(application: Application) : AndroidViewModel(application) {
 
     private val robotRepository = RobotRepository(application)
     val robotStateFlow get() = robotRepository.robotStateFlow
     val statusLiveData get() = robotRepository.statusLiveData
 
-    fun insertRobot(robot:Robot){
-        robotRepository.insertRobot(robot)
+    // Firebase'e robot ekleme işlemi
+    fun insertRobot(robot: Robot, userEmail: String) {
+        robotRepository.insertRobot(robot, )
     }
-    fun clearStatusLiveData(){
-        robotRepository.clearStatusLiveData()
-    }
-    fun getRobotList(){
+
+    // Firebase'den robotları getirme işlemi
+    fun getRobotList(userEmail: String) {
         robotRepository.getRobotList()
     }
-    fun updateRobot(robot:Robot){
+
+    // Firebase'de robot güncelleme işlemi
+    fun updateRobot(robot: Robot, userEmail: String) {
         robotRepository.updateRobot(robot)
     }
-    fun deleteRobotUsingId(robotId:String){
+
+    // Firebase'de robot silme işlemi
+    fun deleteRobotUsingId(robotId: String, userEmail: String) {
         robotRepository.deleteRobotUsingId(robotId)
+    }
+
+    fun clearStatusLiveData() {
+        robotRepository.clearStatusLiveData()
     }
 }

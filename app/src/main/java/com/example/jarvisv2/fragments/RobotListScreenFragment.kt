@@ -29,6 +29,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -41,34 +42,32 @@ class RobotListScreenFragment : Fragment() {
         ViewModelProvider(this)[RobotViewModel::class.java]
     }
 
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_robot_list_screen, container, false)
 
         try {
+            auth = FirebaseAuth.getInstance()
 
+            val toolBarView = view.findViewById<View>(R.id.toolbarLayout)
+            val robotImageLl = toolBarView.findViewById<View>(R.id.robot_image_ll)
+            robotImageLl.gone()
 
-
-        val tool_bar_view = view.findViewById<View>(R.id.toolbarLayout)
-
-        val robot_image_ll = tool_bar_view.findViewById<View>(R.id.robot_image_ll)
-        robot_image_ll.gone()
-
-        val close_image = tool_bar_view.findViewById<ImageView>(R.id.back_img)
-        close_image.setOnClickListener {
-            startActivity(Intent(context, MainActivity::class.java))
-        }
-
-        val title_txt = tool_bar_view.findViewById<TextView>(R.id.titleTxt)
-        title_txt.text = "Jarvis V2"
-
-            }catch (e:Exception){
-                e.printStackTrace()
+            val closeImage = toolBarView.findViewById<ImageView>(R.id.back_img)
+            closeImage.setOnClickListener {
+                startActivity(Intent(context, MainActivity::class.java))
             }
+
+            val titleTxt = toolBarView.findViewById<TextView>(R.id.titleTxt)
+            titleTxt.text = "Jarvis V2"
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
         return view
     }
 
@@ -77,63 +76,61 @@ class RobotListScreenFragment : Fragment() {
         try {
 
             val settingImg = view.findViewById<ImageView>(R.id.setting_img)
-
             settingImg.visible()
             val encryptedPreferenceManager = EncryptSharedPreferenceManager(view.context)
             settingImg.setOnClickListener {
-                apiKeyDialog(it,encryptedPreferenceManager)
-
+                apiKeyDialog(it, encryptedPreferenceManager)
             }
 
-        val addRobotFabBtn = view.findViewById<ExtendedFloatingActionButton>(R.id.addRobotFabBtn)
+            val addRobotFabBtn = view.findViewById<ExtendedFloatingActionButton>(R.id.addRobotFabBtn)
 
-        addRobotFabBtn.setOnClickListener {
-            addRobotDialog(it)
+            addRobotFabBtn.setOnClickListener {
+                addRobotDialog(it)
+            }
 
-        }
+            val robotAdapter = RobotAdapter { type, position, robot ->
 
-        val robotAdapter = RobotAdapter { type, position, robot ->
-
-            when (type) {
-                "delete" -> {
-                    robotViewModel.deleteRobotUsingId(robot.robotId)
-                }
-
-                "update" -> {
-                    updateRobotDialog(view,robot)
-                }
-
-                else -> {
-                    if (encryptedPreferenceManager.openAPIKey.trim().isNotEmpty()){
-                        val action =
-                            RobotListScreenFragmentDirections
-                                .actionRobotListScreenFragmentToChatScreenFragment(
-                                    robot.robotId,
-                                    robot.robotImg,
-                                    robot.robotName
-                                )
-                        findNavController().navigate(action)
-                    }else{
-                        view.context.longToastShow("Enter the Api Key Setting Icom Click")
+                when (type) {
+                    "delete" -> {
+                        val userEmail = auth.currentUser?.email ?: return@RobotAdapter
+                        robotViewModel.deleteRobotUsingId(robot.robotId, userEmail)
                     }
 
+                    "update" -> {
+                        updateRobotDialog(view, robot)
+                    }
+
+                    else -> {
+                        if (encryptedPreferenceManager.openAPIKey.trim().isNotEmpty()) {
+                            val action =
+                                RobotListScreenFragmentDirections
+                                    .actionRobotListScreenFragmentToChatScreenFragment(
+                                        robot.robotId,
+                                        robot.robotImg,
+                                        robot.robotName
+                                    )
+                            findNavController().navigate(action)
+                        } else {
+                            view.context.longToastShow("Enter the Api Key Setting Icon Click")
+                        }
+                    }
                 }
             }
 
-        }
-        val robotRv = view.findViewById<RecyclerView>(R.id.robotRV)
-        robotRv.adapter = robotAdapter
-        robotAdapter.registerAdapterDataObserver(object:
-        RecyclerView.AdapterDataObserver(){
-            override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
-                super.onItemRangeChanged(positionStart, itemCount)
-                robotRv.smoothScrollToPosition(positionStart)
-            }
-        })
-        callGetRobotList(robotAdapter,view)
-        robotViewModel.getRobotList()
-        statusCallBack(view)
-        }catch (e:Exception){
+            val robotRv = view.findViewById<RecyclerView>(R.id.robotRV)
+            robotRv.adapter = robotAdapter
+            robotAdapter.registerAdapterDataObserver(object :
+                RecyclerView.AdapterDataObserver() {
+                override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
+                    super.onItemRangeChanged(positionStart, itemCount)
+                    robotRv.smoothScrollToPosition(positionStart)
+                }
+            })
+            callGetRobotList(robotAdapter, view)
+            val userEmail = auth.currentUser?.email ?: return
+            robotViewModel.getRobotList(userEmail)
+            statusCallBack(view)
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
@@ -141,16 +138,15 @@ class RobotListScreenFragment : Fragment() {
     private fun callGetRobotList(robotAdapter: RobotAdapter, view: View) {
         CoroutineScope(Dispatchers.Main).launch {
             robotViewModel.robotStateFlow.collectLatest {
-                when(it.status){
-                    Status.LOADING->{}
-                    Status.SUCCESS->{
-                        it.data?.collect{robotList ->
-                            robotAdapter.submitList(robotList)
-                        }
+                when (it.status) {
+                    Status.LOADING -> {
+                        // Yükleniyor göstergesi eklenebilir
                     }
-                    Status.ERROR->{
+                    Status.SUCCESS -> {
+                        robotAdapter.submitList(it.data)
+                    }
+                    Status.ERROR -> {
                         it.message?.let { it1 -> view.context.longToastShow(it1) }
-
                     }
                 }
             }
@@ -159,7 +155,6 @@ class RobotListScreenFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // clear the statuslivedata value when the fragments view destroyed
         robotViewModel.clearStatusLiveData()
     }
 
@@ -168,34 +163,31 @@ class RobotListScreenFragment : Fragment() {
             .statusLiveData
             .observe(viewLifecycleOwner) {
                 if (it != null) {
-                when (it.status) {
-                    Status.LOADING -> {}
-                    Status.SUCCESS -> {
+                    when (it.status) {
+                        Status.LOADING -> {}
+                        Status.SUCCESS -> {
                             when (it.data as StatusResult) {
                                 StatusResult.Added -> {
                                     Log.d("StatusResult", "Added")
                                 }
-
                                 StatusResult.Updated -> {
                                     Log.d("StatusResult", "Updated")
                                 }
-
                                 StatusResult.Deleted -> {
                                     Log.d("StatusResult", "Deleted")
                                 }
                             }
                             it.message?.let { it1 -> view.context.longToastShow(it1) }
                         }
-
                         Status.ERROR -> {
                             it.message?.let { it1 -> view.context.longToastShow(it1) }
                         }
                     }
                 }
             }
-
     }
-    private fun updateRobotDialog(view: View,robot: Robot) {
+
+    private fun updateRobotDialog(view: View, robot: Robot) {
         val edRobotName = TextInputEditText(view.context)
         edRobotName.hint = "Enter Robot Name"
         edRobotName.maxLines = 3
@@ -219,12 +211,13 @@ class RobotListScreenFragment : Fragment() {
             .setPositiveButton("Update") { dialog, which ->
                 val robotName = edRobotName.text.toString().trim()
                 if (robotName.isNotEmpty()) {
+                    val userEmail = auth.currentUser?.email ?: return@setPositiveButton
                     robotViewModel.updateRobot(
                         Robot(
                             robot.robotId,
                             robotName,
                             robot.robotImg
-                        )
+                        ), userEmail
                     )
                 } else {
                     view.context.longToastShow("Required")
@@ -260,13 +253,15 @@ class RobotListScreenFragment : Fragment() {
             .setPositiveButton("Add") { dialog, which ->
                 val robotName = edRobotName.text.toString().trim()
                 if (robotName.isNotEmpty()) {
-                    robotViewModel.insertRobot(
-                        Robot(
-                            UUID.randomUUID().toString(),
-                            robotName,
-                            (robotImageList.indices).random()
-                        )
+                    val newRobot = Robot(
+                        UUID.randomUUID().toString(),
+                        robotName,
+                        (robotImageList.indices).random()
                     )
+
+                    val userEmail = auth.currentUser?.email ?: return@setPositiveButton
+                    robotViewModel.insertRobot(newRobot, userEmail)
+
                 } else {
                     view.context.longToastShow("Required")
                 }
@@ -275,8 +270,9 @@ class RobotListScreenFragment : Fragment() {
             .create()
             .show()
     }
-    private fun apiKeyDialog(view: View,encryptSharedPreferenceManager: EncryptSharedPreferenceManager) {
-        val edApiKey  = TextInputEditText(view.context)
+
+    private fun apiKeyDialog(view: View, encryptSharedPreferenceManager: EncryptSharedPreferenceManager) {
+        val edApiKey = TextInputEditText(view.context)
         edApiKey.hint = "Enter Api Key"
         edApiKey.maxLines = 3
 
@@ -299,7 +295,7 @@ class RobotListScreenFragment : Fragment() {
             .setPositiveButton("Update") { dialog, which ->
                 val apiKey = edApiKey.text.toString().trim()
                 if (apiKey.isNotEmpty()) {
-                   encryptSharedPreferenceManager.openAPIKey = apiKey
+                    encryptSharedPreferenceManager.openAPIKey = apiKey
                 } else {
                     view.context.longToastShow("Required")
                 }
@@ -307,9 +303,8 @@ class RobotListScreenFragment : Fragment() {
             .setNegativeButton("Cancel", null)
             .create()
             .show()
-        if (encryptSharedPreferenceManager.openAPIKey.trim().isNotEmpty()){
+        if (encryptSharedPreferenceManager.openAPIKey.trim().isNotEmpty()) {
             edApiKey.setText(encryptSharedPreferenceManager.openAPIKey.trim())
         }
     }
-
 }

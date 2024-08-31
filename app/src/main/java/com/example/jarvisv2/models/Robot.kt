@@ -8,7 +8,10 @@ import androidx.room.PrimaryKey
 data class Robot (
     @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "robotId")
-    val robotId:String,
-    val robotName:String,
-    val robotImg:Int
-)
+    var robotId: String = "",  // Varsayılan değer ekledik
+    var robotName: String = "",  // Varsayılan değer ekledik
+    var robotImg: Int = 0  // Varsayılan değer ekledik
+) {
+    // Room ve Firebase'in sorunsuz çalışabilmesi için parametresiz yapıcı sağlıyoruz
+    constructor() : this("", "", 0)
+}

@@ -1,6 +1,5 @@
 package com.example.jarvisv2.repository
 
-import FirebaseRepository
 import android.app.Application
 import android.util.Log
 import android.widget.Toast
@@ -57,20 +56,16 @@ class ChatRepository(val application: Application) {
 
 
     private val imageList = ArrayList<Data>()
-    fun createUserSpecificChat(email: String, message: String) {
-        firebaseRepository.addChat(email, message, "user")
+    fun createUserSpecificChat(email: String, robotName: String, message: String) {
+        //firebaseRepository.addRobotChat(email, robotName, message, "user")
     }
 
-    fun createUserSpecificImage(email: String, imageUrl: String) {
-        firebaseRepository.addImage(email, imageUrl)
+    fun getUserRobotChats(email: String, robotName: String): DatabaseReference {
+        return firebaseRepository.getUserRobotChats(email)
     }
 
-    fun getUserChats(email: String): DatabaseReference {
-        return firebaseRepository.getUserChats(email)
-    }
-
-    fun getUserImages(email: String): DatabaseReference {
-        return firebaseRepository.getUserImages(email)
+    fun createUserSpecificCategory(email: String) {
+        firebaseRepository.createUserSpecificCategory()
     }
 
     fun getChatList(robotId: String) {
@@ -89,12 +84,7 @@ class ChatRepository(val application: Application) {
         }
     }
 
-    fun createUserSpecificCategory(email: String) {
-        val formattedEmail = email.replace(".", "")  // Firebase key için mail adresi formatlama
-        val userCategoryRef = databaseReference.child("users").child(formattedEmail)
-        userCategoryRef.child("chat").setValue(true)
-        userCategoryRef.child("image").setValue(true)
-    }
+
     fun create_chat_complation(message: String, robotId: String) {
         val receiverId = UUID.randomUUID().toString()
         CoroutineScope(Dispatchers.IO).launch {

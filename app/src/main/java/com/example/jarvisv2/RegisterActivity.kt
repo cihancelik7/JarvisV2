@@ -7,10 +7,9 @@ import android.text.method.PasswordTransformationMethod
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.jarvisv2.databinding.ActivityRegisterBinding
+import com.example.jarvisv2.repository.FirebaseRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
-
-import FirebaseRepository // FirebaseRepository'yi dahil edin
 
 class RegisterActivity : AppCompatActivity() {
 
@@ -92,7 +91,7 @@ class RegisterActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // Kayıt başarılı, kullanıcıya özel kategorileri oluştur
-                    firebaseRepository.createUserSpecificCategory(email)
+                    firebaseRepository.createUserSpecificCategory()
 
                     Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show()
                     val intent = Intent(this@RegisterActivity, LoginActivity::class.java)

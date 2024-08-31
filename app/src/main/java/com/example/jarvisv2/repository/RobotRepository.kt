@@ -3,94 +3,99 @@ package com.example.jarvisv2.repository
 import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.jarvisv2.database.ChatGPTDatabase
 import com.example.jarvisv2.models.Robot
-import com.example.jarvisv2.utils.EncryptSharedPreferenceManager
 import com.example.jarvisv2.utils.Resource
 import com.example.jarvisv2.utils.StatusResult
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.Flow
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 
 class RobotRepository(application: Application) {
-    private val robotDao = ChatGPTDatabase.getInstance(application).robotDao
-    private val _robotStateFlow = MutableStateFlow<Resource<Flow<List<Robot>>>>(Resource.Loading())
-    val robotStateFlow: StateFlow<Resource<Flow<List<Robot>>>>
-        get() = _robotStateFlow
+
+    private val _robotStateFlow = MutableStateFlow<Resource<List<Robot>>>(Resource.Loading())
+    val robotStateFlow: StateFlow<Resource<List<Robot>>> get() = _robotStateFlow
 
     private val _statusLiveData = MutableLiveData<Resource<StatusResult>?>()
-    val statusLiveData: LiveData<Resource<StatusResult>?>
-        get() = _statusLiveData
+    val statusLiveData: LiveData<Resource<StatusResult>?> get() = _statusLiveData
+
+    private val firebaseDatabase = FirebaseDatabase.getInstance().reference
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+
+    // Kullanıcının UID'sini almak için
+    private fun getUserUid(): String {
+        return auth.currentUser?.uid ?: throw IllegalStateException("User is not logged in")
+    }
+
+    // Firebase'e robot ekleme işlemi
+    fun insertRobot(robot: Robot) {
+        val uid = getUserUid()
+        val userCategoryRef = firebaseDatabase.child("users").child(uid).child("robots")
+
+        userCategoryRef.child(robot.robotId).setValue(robot)
+            .addOnSuccessListener {
+                _statusLiveData.postValue(Resource.Success(StatusResult.Added, "Robot added successfully"))
+            }
+            .addOnFailureListener { exception ->
+                _statusLiveData.postValue(Resource.Error(exception.message.toString()))
+            }
+    }
+
+    // Firebase'den robotları getirme işlemi
+    fun getRobotList() {
+        val uid = getUserUid()
+        val userCategoryRef = firebaseDatabase.child("users").child(uid).child("robots")
+
+        userCategoryRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val robotList = mutableListOf<Robot>()
+                snapshot.children.forEach { childSnapshot ->
+                    val robot = childSnapshot.getValue(Robot::class.java)
+                    if (robot != null) {
+                        robotList.add(robot)
+                    }
+                }
+                _robotStateFlow.value = Resource.Success(robotList)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                _robotStateFlow.value = Resource.Error(error.message)
+            }
+        })
+    }
+
+    // Firebase'de robot güncelleme işlemi
+    fun updateRobot(robot: Robot) {
+        val uid = getUserUid()
+        val userCategoryRef = firebaseDatabase.child("users").child(uid).child("robots").child(robot.robotId)
+
+        userCategoryRef.setValue(robot)
+            .addOnSuccessListener {
+                _statusLiveData.postValue(Resource.Success(StatusResult.Updated, "Robot updated successfully"))
+            }
+            .addOnFailureListener { exception ->
+                _statusLiveData.postValue(Resource.Error(exception.message.toString()))
+            }
+    }
+
+    // Firebase'de robot silme işlemi
+    fun deleteRobotUsingId(robotId: String) {
+        val uid = getUserUid()
+        val userCategoryRef = firebaseDatabase.child("users").child(uid).child("robots").child(robotId)
+
+        userCategoryRef.removeValue()
+            .addOnSuccessListener {
+                _statusLiveData.postValue(Resource.Success(StatusResult.Deleted, "Robot deleted successfully"))
+            }
+            .addOnFailureListener { exception ->
+                _statusLiveData.postValue(Resource.Error(exception.message.toString()))
+            }
+    }
 
     fun clearStatusLiveData() {
         _statusLiveData.value = null
-    }
-
-    fun getRobotList() {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                _robotStateFlow.emit(Resource.Loading())
-                val result = robotDao.getRobotList()
-                _robotStateFlow.emit(Resource.Success(result))
-            } catch (e: Exception) {
-                e.printStackTrace()
-                _robotStateFlow.emit(Resource.Error(e.message.toString()))
-            }
-        }
-    }
-
-    fun insertRobot(robot: Robot) {
-        try {
-            _statusLiveData.postValue(Resource.Loading())
-            CoroutineScope(Dispatchers.IO).launch {
-                val result = robotDao.insertRobot(robot)
-                handleResult(result.toInt(), "Inserted robot successfully", StatusResult.Added)
-            }
-        } catch (e: Exception) {
-            _statusLiveData.postValue(Resource.Error(e.message.toString()))
-        }
-    }
-
-    fun deleteRobotUsingId(robotId: String) {
-        try {
-            _statusLiveData.postValue(Resource.Loading())
-            CoroutineScope(Dispatchers.IO).launch {
-                async {
-                    robotDao.deleteRobotUsingId(robotId)
-                }.await()
-
-                val result = async {
-                    robotDao.deleteRobotUsingId(robotId)
-                }.await()
-
-                handleResult(result, "Deleted robot and Chat successfully", StatusResult.Deleted)
-            }
-        } catch (e: Exception) {
-            _statusLiveData.postValue(Resource.Error(e.message.toString()))
-        }
-    }
-
-    fun updateRobot(robot: Robot) {
-        try {
-            _statusLiveData.postValue(Resource.Loading())
-            CoroutineScope(Dispatchers.IO).launch {
-                val result = robotDao.updateRobot(robot)
-                handleResult(result, "Updated robot successfully", StatusResult.Updated)
-            }
-        } catch (e: Exception) {
-            _statusLiveData.postValue(Resource.Error(e.message.toString()))
-        }
-    }
-
-    private fun handleResult(result: Int, message: String, statusResult: StatusResult) {
-        if (result != -1) {
-            _statusLiveData.postValue(Resource.Success(statusResult, message))
-        } else {
-            _statusLiveData.postValue(Resource.Error("Somethıng went wrong"))
-        }
     }
 }
