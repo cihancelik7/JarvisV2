@@ -42,7 +42,7 @@ class RobotListScreenFragment : Fragment() {
         ViewModelProvider(this)[RobotViewModel::class.java]
     }
 
-    private lateinit var auth: FirebaseAuth
+    private lateinit var auth: FirebaseAuth  // FirebaseAuth tanımlaması
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,19 +51,19 @@ class RobotListScreenFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_robot_list_screen, container, false)
 
         try {
-            auth = FirebaseAuth.getInstance()
+            auth = FirebaseAuth.getInstance()  // FirebaseAuth başlatılması
 
-            val toolBarView = view.findViewById<View>(R.id.toolbarLayout)
-            val robotImageLl = toolBarView.findViewById<View>(R.id.robot_image_ll)
-            robotImageLl.gone()
+            val tool_bar_view = view.findViewById<View>(R.id.toolbarLayout)
+            val robot_image_ll = tool_bar_view.findViewById<View>(R.id.robot_image_ll)
+            robot_image_ll.gone()
 
-            val closeImage = toolBarView.findViewById<ImageView>(R.id.back_img)
-            closeImage.setOnClickListener {
+            val close_image = tool_bar_view.findViewById<ImageView>(R.id.back_img)
+            close_image.setOnClickListener {
                 startActivity(Intent(context, MainActivity::class.java))
             }
 
-            val titleTxt = toolBarView.findViewById<TextView>(R.id.titleTxt)
-            titleTxt.text = "Jarvis V2"
+            val title_txt = tool_bar_view.findViewById<TextView>(R.id.titleTxt)
+            title_txt.text = "Jarvis V2"
 
         } catch (e: Exception) {
             e.printStackTrace()
@@ -116,7 +116,6 @@ class RobotListScreenFragment : Fragment() {
                     }
                 }
             }
-
             val robotRv = view.findViewById<RecyclerView>(R.id.robotRV)
             robotRv.adapter = robotAdapter
             robotAdapter.registerAdapterDataObserver(object :
@@ -136,12 +135,12 @@ class RobotListScreenFragment : Fragment() {
     }
 
     private fun callGetRobotList(robotAdapter: RobotAdapter, view: View) {
+        val userEmail = auth.currentUser?.email ?: return
+
         CoroutineScope(Dispatchers.Main).launch {
             robotViewModel.robotStateFlow.collectLatest {
                 when (it.status) {
-                    Status.LOADING -> {
-                        // Yükleniyor göstergesi eklenebilir
-                    }
+                    Status.LOADING -> {}
                     Status.SUCCESS -> {
                         robotAdapter.submitList(it.data)
                     }

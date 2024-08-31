@@ -35,9 +35,17 @@ class RobotRepository(application: Application) {
         val uid = getUserUid()
         val userCategoryRef = firebaseDatabase.child("users").child(uid).child("robots")
 
-        userCategoryRef.child(robot.robotId).setValue(robot)
+        val robotValues = hashMapOf<String, Any>(
+            "robotName" to robot.robotName,
+            "robotImg" to robot.robotImg
+        )
+
+        userCategoryRef.child(robot.robotId).updateChildren(robotValues)
             .addOnSuccessListener {
                 _statusLiveData.postValue(Resource.Success(StatusResult.Added, "Robot added successfully"))
+
+                // Robot eklendikten sonra veriyi tekrar çek
+                getRobotList()
             }
             .addOnFailureListener { exception ->
                 _statusLiveData.postValue(Resource.Error(exception.message.toString()))
@@ -49,7 +57,8 @@ class RobotRepository(application: Application) {
         val uid = getUserUid()
         val userCategoryRef = firebaseDatabase.child("users").child(uid).child("robots")
 
-        userCategoryRef.addValueEventListener(object : ValueEventListener {
+        // Verileri sadece bir kez çekecek olan listener
+        userCategoryRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val robotList = mutableListOf<Robot>()
                 snapshot.children.forEach { childSnapshot ->
